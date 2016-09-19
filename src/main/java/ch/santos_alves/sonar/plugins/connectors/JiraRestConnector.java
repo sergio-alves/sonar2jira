@@ -10,6 +10,7 @@ import org.sonar.api.batch.postjob.issue.PostJobIssue;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -144,14 +145,15 @@ public class JiraRestConnector {
 			.handler(handler -> {
 				log.info("Request sent and response received : {} : {} ", handler.statusCode(),	handler.statusMessage());
 
-				if (handler.statusCode() == 200) {
+				if (handler.statusCode() >= 200  && handler.statusCode() < 300) {
 
 					handler.bodyHandler(bodyHandler -> {
 						JsonObject response = new JsonObject(new String(bodyHandler.getBytes()));
 
 						log.info("Data received\r\n{}\r\n", response.encodePrettily());
-
+						
 						if (response.getInteger("total") == 0) {
+							
 							future.complete(false);
 						} else {
 							future.complete(true);

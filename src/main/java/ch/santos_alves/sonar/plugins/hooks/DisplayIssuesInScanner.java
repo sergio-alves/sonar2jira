@@ -9,12 +9,10 @@ import org.sonar.api.batch.postjob.PostJobContext;
 import org.sonar.api.batch.postjob.PostJobDescriptor;
 import org.sonar.api.batch.postjob.issue.PostJobIssue;
 import org.sonar.api.batch.rule.Severity;
-import org.sonar.api.internal.apachecommons.codec.digest.Md5Crypt;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
 import ch.santos_alves.sonar.plugins.connectors.JiraRestConnector;
-import ch.santos_alves.sonar.plugins.rules.CreateIssuesOnJavaFilesSensor;
 
 public class DisplayIssuesInScanner implements PostJob {
 
