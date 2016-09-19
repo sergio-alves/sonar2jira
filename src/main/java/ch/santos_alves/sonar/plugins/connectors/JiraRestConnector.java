@@ -35,7 +35,25 @@ public class JiraRestConnector {
 		this.client = Vertx.vertx().createHttpClient(options);
 	}
 
-	public Future<Boolean> createNewIssue(String issueKey, PostJobIssue issue) {
+	public boolean createNewIssue(String issueKey, PostJobIssue issue) {
+
+		Future<Boolean> future = asyncCreateNewIssue(issueKey, issue);
+
+		log.info("Going to check synchronously if a ticket with sonar id url {} exists", issueKey);
+
+		while (!future.isComplete()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return future.result();
+	}
+	
+	public Future<Boolean> asyncCreateNewIssue(String issueKey, PostJobIssue issue) {
 		Future<Boolean> response = Future.future();
 
 		JsonObject request = new JsonObject();
