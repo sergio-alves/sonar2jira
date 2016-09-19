@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonar.api.batch.postjob.issue.PostJobIssue;
+import org.sonar.api.batch.rule.Severity;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
@@ -60,22 +61,34 @@ public class JiraRestConnector {
 		JsonObject fields = new JsonObject();
 		JsonObject project = new JsonObject();
 		JsonObject type = new JsonObject();
+		JsonObject priority = new JsonObject();
 
 		request.put("fields", fields);
 
 		String[] parts = issue.componentKey().split(":");
  		
 		fields.put("project", project);
-		fields.put("summary", issue.message() + "@" + );
-		fields.put("description",
-				issue.ruleKey().rule() + " found in " + issue.componentKey() + " @ line " + issue.line());
+		fields.put("summary", issue.ruleKey().toString() + " : " + issue.message() + "@" + parts[2] + "("+ issue.line() +")" );
+		fields.put("description", "Project : "+parts[1]+ "\r\nFile : " + parts[2] +"\r\nLine : " + issue.line() + "\r\nIssue : " + issue.message());
 		fields.put("customfield_10002", issueKey);
 		fields.put("issuetype", type);
+		fields.put("priority", priority);
+		
+		
+		Map<Severity, String> maps = new HashMap<>();
+		maps.put(Severity.BLOCKER, "Highest");
+		maps.put(Severity.CRITICAL, "High");
+		maps.put(Severity.MAJOR, "Medium");
+		maps.put(Severity.MINOR, "Low");
+		maps.put(Severity.INFO, "Lowest");
+						
 		type.put("id", "10001");		
+		
+		priority.put("name", maps.get(issue.severity()));
 		
 		// TODO: move it to config
 		Map<String, String> projectsMapping = new HashMap<>();
-		String[] parts = issue.componentKey().split(":");
+		
 		projectsMapping.put("ch.santos_alves.sonar.plugin:test-application", "PROJTEST");
 
 		project.put("key", projectsMapping.get(parts[0] + ":" + parts[1]));

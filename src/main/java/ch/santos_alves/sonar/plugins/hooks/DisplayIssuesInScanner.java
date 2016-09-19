@@ -85,8 +85,7 @@ public class DisplayIssuesInScanner implements PostJob {
 				ruleKey, issueKey, inputComponentKey, componentKey, issueMessage, issueLine, severity);
 		
 		
-		String md5 = Base64.getEncoder().encodeToString(MessageDigest.getInstance("MD5").digest(new String(ruleKey + ":" + issueKey + ":" + inputComponentKey + ":" + componentKey
-				+ ":" + issueMessage + ":" + issueLine + ":" + severity).getBytes())); 
+		String md5 = Base64.getEncoder().encodeToString(MessageDigest.getInstance("MD5").digest(new String(ruleKey + ":"+ componentKey + ":" + issueMessage + ":" + issueLine + ":" + severity).getBytes())); 
 		
 		return md5;
 	}
