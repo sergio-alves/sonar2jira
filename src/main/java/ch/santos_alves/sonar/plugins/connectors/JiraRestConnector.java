@@ -63,8 +63,10 @@ public class JiraRestConnector {
 
 		request.put("fields", fields);
 
+		String[] parts = issue.componentKey().split(":");
+ 		
 		fields.put("project", project);
-		fields.put("summary", issue.ruleKey().rule());
+		fields.put("summary", issue.message() + "@" + );
 		fields.put("description",
 				issue.ruleKey().rule() + " found in " + issue.componentKey() + " @ line " + issue.line());
 		fields.put("customfield_10002", issueKey);
