@@ -1,7 +1,5 @@
 package ch.santos_alves.sonar.plugins.connectors;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +8,6 @@ import org.sonar.api.batch.postjob.issue.PostJobIssue;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -19,6 +16,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public class JiraRestConnector {
+	private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
+	private static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
 	protected static final String APPLICATION_JSON = "application/json";
 	private static final Logger log = Loggers.get(JiraRestConnector.class);
 	private String botUsername;
@@ -64,8 +63,8 @@ public class JiraRestConnector {
 		log.info("Going to send request :  \r\n{}", request.encodePrettily());
 		
 		client.post("/rest/api/2/issue")
-			.putHeader("Content-Type", APPLICATION_JSON)
-			.putHeader("Authorization", getBasicAuthenticationString())
+			.putHeader(HTTP_HEADER_CONTENT_TYPE, APPLICATION_JSON)
+			.putHeader(HTTP_HEADER_AUTHORIZATION, getBasicAuthenticationString())
 			.handler(handler -> {
 					if (handler.statusCode() == 200) {
 						log.info("Create Issue Response received with StatusCode 200");
@@ -84,27 +83,6 @@ public class JiraRestConnector {
 					log.error("Something went wrong creating the issue in JIRA.", handler.getCause());
 					response.complete(false);
 				}).end(request.encode());
-
-		/*
-		 * { "update": { "worklog": [ { "add": { "timeSpent": "60m", "started":
-		 * "2011-07-05T11:05:00.000+0000" } } ] }, "fields": { "project": {
-		 * "id": "10000" }, "summary": "something's wrong", "issuetype": { "id":
-		 * "10000" }, "assignee": { "name": "homer" }, "reporter": { "name":
-		 * "smithers" }, "priority": { "id": "20000" }, "labels": [ "bugfix",
-		 * "blitz_test" ], "timetracking": { "originalEstimate": "10",
-		 * "remainingEstimate": "5" }, "security": { "id": "10000" },
-		 * "versions": [ { "id": "10000" } ], "environment": "environment",
-		 * "description": "description", "duedate": "2011-03-11", "fixVersions":
-		 * [ { "id": "10001" } ], "components": [ { "id": "10000" } ],
-		 * "customfield_30000": [ "10000", "10002" ], "customfield_80000": {
-		 * "value": "red" }, "customfield_20000": "06/Jul/11 3:25 PM",
-		 * "customfield_40000": "this is a text field", "customfield_70000": [
-		 * "jira-administrators", "jira-software-users" ], "customfield_60000":
-		 * "jira-software-users", "customfield_50000":
-		 * "this is a text area. big text.", "customfield_10000": "09/Jun/81" }
-		 * }
-		 */
-
 		return response;
 	}
 
@@ -141,7 +119,8 @@ public class JiraRestConnector {
 		
 		
 		client.post("/rest/api/2/search")
-			.putHeader("Authorization", getBasicAuthenticationString())
+			.putHeader(HTTP_HEADER_AUTHORIZATION, getBasicAuthenticationString())
+			.putHeader(HTTP_HEADER_CONTENT_TYPE, APPLICATION_JSON)
 			.handler(handler -> {
 				log.info("Request sent and response received : {} : {} ", handler.statusCode(),	handler.statusMessage());
 
